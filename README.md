@@ -24,6 +24,18 @@ ffmpeg_executable_path: "/usr/bin/ffmpeg"
 
 # The final path of ffprobe executable
 ffprobe_executable_path: "/usr/bin/ffprobe"
+
+# The branch to install: builds or releases
+ffmpeg_flavour: "builds"
+
+# The arch of the download bundle
+# Available archs:
+#  - 32bit or i686 (Different names for the same file)
+#  - 64bit or amd64 (Different names for the same file)
+#  - arm64
+#  - armhf
+#  - armel 
+ffmpeg_arch: "64bit"
 ```
 
 Dependencies

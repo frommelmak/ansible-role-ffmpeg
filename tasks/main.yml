@@ -16,17 +16,41 @@
   when: (not ffmpeg_bin.stat.exists) or
         (not ffprobe_bin.stat.exists)
 
+- name: Build URL resource for "release" flavour 
+  set_fact:
+    ffmpeg_source: "http://johnvansickle.com/ffmpeg/{{ ffmpeg_flavour }}/ffmpeg-release-{{ ffmpeg_arch }}-static.tar.xz"
+    ffmpeg_file: "ffmpeg-release-{{ ffmpeg_arch }}-static.tar.xz"
+  when: ffmpeg_flavour == "releases"
+  
+- name: Build URL resource for "builds" flavour 
+  set_fact:
+    ffmpeg_source: "http://johnvansickle.com/ffmpeg/{{ ffmpeg_flavour }}/ffmpeg-git-{{ ffmpeg_arch }}-static.tar.xz"
+    ffmpeg_file: "ffmpeg-git-{{ ffmpeg_arch }}-static.tar.xz"
+  when: ffmpeg_flavour == "builds"
+  
 - name: Download from custom source
   get_url:
-    url: http://johnvansickle.com/ffmpeg/builds/ffmpeg-git-64bit-static.tar.xz
-    dest: "{{ ffmpeg_temp_path }}/ffmpeg-git-64bit-static.tar.xz"
+    url: "{{ ffmpeg_source }}"
+    dest: "{{ ffmpeg_temp_path }}/{{ ffmpeg_file }}"
   when: (not ffmpeg_bin.stat.exists) or
         (not ffprobe_bin.stat.exists)
 
 - name: Unarchive to temp directory
-  shell: tar xf {{ ffmpeg_temp_path }}/ffmpeg-git-64bit-static.tar.xz --strip-components=1 -C {{ ffmpeg_temp_path }}/
+  shell: tar xf {{ ffmpeg_temp_path }}/{{ ffmpeg_file }} --strip-components=1 -C {{ ffmpeg_temp_path }}/
   when: (not ffmpeg_bin.stat.exists) or
         (not ffprobe_bin.stat.exists)
+
+- name: Ensure executable ffmpeg folder path exists
+  file:
+    path: "{{ ffmpeg_executable_path | dirname }}"
+    state: directory
+    recurse: yes
+
+- name: Ensure executable ffprobe folder path exists
+  file:
+    path: "{{ ffprobe_executable_path | dirname }}"
+    state: directory
+    recurse: yes
 
 - name: Move ffmpeg to executables directory
   command: mv {{ ffmpeg_temp_path }}/ffmpeg {{ ffmpeg_executable_path }}
